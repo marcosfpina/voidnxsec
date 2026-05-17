@@ -1,0 +1,4 @@
+IADD:00000000:/UacFwConfig.exe
+IDSET:/UacFwConfig.exe:7f00284c36849004474925
+IADD:00000001:/UacFwConfig_source.exe
+IDSET:/UacFwConfig_source.exe:7f00290717946821516953
