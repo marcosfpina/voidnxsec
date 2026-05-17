@@ -1,0 +1,69 @@
+# /etc/udev/rules.d/99-audeze-mobius.rules
+# Audeze Mobius — acesso sem root para todos os modos de operação
+#
+# Aplicar com:
+#   sudo cp udev/99-audeze-mobius.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+#
+# Ou no NixOS (configuration.nix):
+#   services.udev.extraRules = builtins.readFile ./udev/99-audeze-mobius.rules;
+
+# ── Audeze Mobius — Normal Mode ───────────────────────────────────────────────
+SUBSYSTEM=="usb", ATTR{idVendor}=="22d9", ATTR{idProduct}=="0001", \
+  MODE="0666", GROUP="plugdev", \
+  SYMLINK+="audeze-mobius", \
+  TAG+="uaccess", \
+  RUN+="/bin/sh -c 'echo audeze-mobius-connected > /run/audeze-mobius.state'"
+
+# ── Audeze Mobius — Bootloader / DFU Mode ─────────────────────────────────────
+SUBSYSTEM=="usb", ATTR{idVendor}=="22d9", ATTR{idProduct}=="0002", \
+  MODE="0666", GROUP="plugdev", \
+  SYMLINK+="audeze-mobius-dfu", \
+  TAG+="uaccess", \
+  RUN+="/bin/sh -c 'echo audeze-mobius-dfu > /run/audeze-mobius.state'"
+
+# ── Audeze Mobius — DFU Detached ──────────────────────────────────────────────
+SUBSYSTEM=="usb", ATTR{idVendor}=="22d9", ATTR{idProduct}=="0003", \
+  MODE="0666", GROUP="plugdev", \
+  SYMLINK+="audeze-mobius-dfu-detach", \
+  TAG+="uaccess"
+
+# ── Fallback: C-Media chipset (caso o Mobius use VID alternativo) ─────────────
+SUBSYSTEM=="usb", ATTR{idVendor}=="0d8c", ATTR{idProduct}=="*", \
+  ATTRS{product}=="*Mobius*", \
+  MODE="0666", GROUP="plugdev", \
+  TAG+="uaccess"
+
+# ── HID devices do Audeze ─────────────────────────────────────────────────────
+KERNEL=="hidraw*", ATTRS{idVendor}=="22d9", \
+  MODE="0666", GROUP="plugdev", \
+  TAG+="uaccess"
+
+# ── usbmon — necessário para captura de tráfego sem root ─────────────────────
+SUBSYSTEM=="usbmon", MODE="0664", GROUP="wireshark"
+
+# ── ST-Link (caso use JTAG/SWD para acesso físico ao chip) ───────────────────
+# Versão 1
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="3744", \
+  MODE="0666", GROUP="plugdev", TAG+="uaccess"
+# Versão 2
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="3748", \
+  MODE="0666", GROUP="plugdev", TAG+="uaccess"
+# Versão 2.1
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="374b", \
+  MODE="0666", GROUP="plugdev", TAG+="uaccess"
+# Versão 3
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="374e", \
+  MODE="0666", GROUP="plugdev", TAG+="uaccess"
+# Versão 3 HLA
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="374f", \
+  MODE="0666", GROUP="plugdev", TAG+="uaccess"
+
+# ── STM32 DFU bootloader (caso chip interno seja STM32) ──────────────────────
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", \
+  MODE="0666", GROUP="plugdev", TAG+="uaccess"
+
+# ── Nota: adicione seu user ao grupo plugdev ──────────────────────────────────
+# sudo usermod -aG plugdev $USER
+# sudo usermod -aG wireshark $USER  # para captura USB
+# (requer logout/login para efetivar)
