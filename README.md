@@ -24,6 +24,7 @@ sudo usermod -aG plugdev,wireshark $USER
 ```
 
 NixOS:
+
 ```nix
 services.udev.extraRules = builtins.readFile ./udev/99-audeze-mobius.rules;
 users.users.seuuser.extraGroups = [ "plugdev" "wireshark" ];
@@ -76,4 +77,18 @@ openocd \
 ```
 
 ---
-Apache 2.0 — voidnxlabs ecosystem
+
+## Environment
+
+| Field                          | Value                                          |
+| ------------------------------ | ---------------------------------------------- |
+| Host kernel                    | 6.18.31                                        |
+| USB controller (affected port) | xHCI `0000:00:14.0`, bus 3, port `3-2`         |
+| Device VID:PID                 | `0BDA:4B09` (Realtek layer)                    |
+| bcdDevice                      | `0.13`                                         |
+| USB speed                      | High-speed (480 Mbps)                          |
+| Interfaces enumerated          | HID only (audio class never completes)         |
+| Reset origin                   | Device-side (zero host errors)                 |
+| Boot loop interval             | ~1.2s                                          |
+| BIOS version at incident       | 1.53 (updated from 1.31 same session)          |
+| ACPI anomaly                   | `\_SB.PC00.RP08.CMDR` AE_NOT_FOUND post-update |
