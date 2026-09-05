@@ -199,7 +199,7 @@
             echo "Target: $TARGET"
             echo ""
 
-            for fw in "$TARGET"/*.bin "$TARGET"/*.hex "$TARGET"/*.dfu 2>/dev/null; do
+            for fw in "$TARGET"/*.bin "$TARGET"/*.hex "$TARGET"/*.dfu; do
               [ -f "$fw" ] || continue
               echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "Arquivo: $fw"
